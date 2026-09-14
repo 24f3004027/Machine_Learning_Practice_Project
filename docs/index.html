@@ -4,13 +4,591 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Heavy Equipment Price Prediction | IIT Madras MLP Project</title>
-  <link rel="stylesheet" href="style.css">
+  
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       CSS Variables & Modern Reset
+       ========================================================================== */
+    :root {
+      --bg: #030712;
+      --card-bg: rgba(15, 23, 42, 0.65);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-hover: rgba(99, 102, 241, 0.4);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-cyan: #38bdf8;
+      --accent-indigo: #6366f1;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --gradient-accent: linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+      position: relative;
+      perspective: 1000px;
+    }
+
+    /* Interactive Canvas Background */
+    #particle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Ambient Dynamic Mesh Glows */
+    .background-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .glow-blob {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.22;
+      mix-blend-mode: screen;
+      animation: floatMesh 20s infinite alternate ease-in-out;
+    }
+
+    .glow-blob-1 {
+      top: -10%;
+      left: 10%;
+      background: radial-gradient(circle, #6366f1, transparent 70%);
+    }
+
+    .glow-blob-2 {
+      bottom: 10%;
+      right: 5%;
+      background: radial-gradient(circle, #38bdf8, transparent 70%);
+      animation-delay: -7s;
+    }
+
+    .glow-blob-3 {
+      top: 40%;
+      right: 30%;
+      background: radial-gradient(circle, #a855f7, transparent 70%);
+      animation-delay: -12s;
+    }
+
+    @keyframes floatMesh {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(80px, 60px) scale(1.15); }
+      100% { transform: translate(-60px, -40px) scale(0.9); }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ==========================================================================
+       Glassmorphic Navbar
+       ========================================================================== */
+    .navbar {
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      background: rgba(3, 7, 18, 0.7);
+      border-bottom: 1px solid var(--card-border);
+      z-index: 100;
+      padding: 14px 0;
+      transition: border-color 0.3s ease;
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-iitm {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: #c084fc;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
+    }
+
+    .brand-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+    }
+
+    .grade-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+      animation: pulseBorder 4s infinite alternate ease-in-out;
+    }
+
+    .grade-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .grade-value {
+      color: var(--accent-emerald);
+      font-weight: 700;
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+    }
+
+    @keyframes pulseBorder {
+      0% { border-color: rgba(16, 185, 129, 0.2); box-shadow: 0 0 10px rgba(16, 185, 129, 0.1); }
+      100% { border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 0 20px rgba(16, 185, 129, 0.25); }
+    }
+
+    /* ==========================================================================
+       Hero Section
+       ========================================================================== */
+    .hero {
+      padding: 90px 0 60px;
+      text-align: center;
+      position: relative;
+    }
+
+    .pill-tag {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 18px;
+      border-radius: 9999px;
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      margin-bottom: 24px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 5.5vw, 4.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 24px;
+      background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      max-width: 780px;
+      margin: 0 auto 50px;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--text-muted);
+      font-weight: 400;
+      line-height: 1.7;
+    }
+
+    .hero-subtitle strong {
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-style: preserve-3d;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card:hover {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 12px 30px -10px rgba(56, 189, 248, 0.3);
+    }
+
+    .stat-num {
+      font-family: var(--font-mono);
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: var(--gradient-accent);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ==========================================================================
+       Sections & Cards
+       ========================================================================== */
+    .card-section {
+      padding: 60px 0;
+    }
+
+    .card-section h2 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      margin-bottom: 32px;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-section h2::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 24px;
+      background: var(--gradient-accent);
+      border-radius: 4px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 32px 24px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: transform 0.2s cubic-bezier(0.1, 1, 0.1, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    /* Mouse Follow Spot-Glare */
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: var(--mouse-y, -1000px);
+      left: var(--mouse-x, -1000px);
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle closest-side, rgba(99, 102, 241, 0.18), transparent 80%);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      opacity: 0;
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-card .icon {
+      font-size: 2.2rem;
+      margin-bottom: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transform: translateZ(25px);
+    }
+
+    .feature-card h3 {
+      font-size: 1.15rem;
+      margin-bottom: 12px;
+      font-weight: 600;
+      color: #fff;
+      transform: translateZ(20px);
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      transform: translateZ(10px);
+    }
+
+    /* ==========================================================================
+       Table Performance
+       ========================================================================== */
+    .table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow-x: auto;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.02);
+      padding: 18px 24px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    td {
+      padding: 18px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+    }
+
+    td:first-child {
+      font-family: var(--font-sans);
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    tbody tr {
+      transition: background-color 0.25s ease, transform 0.2s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .highlight-row {
+      background: rgba(99, 102, 241, 0.08) !important;
+      border-left: 3px solid var(--accent-indigo);
+    }
+
+    .highlight-row td {
+      color: #fff;
+    }
+
+    .status {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-family: var(--font-sans);
+    }
+
+    .status-baseline {
+      background: rgba(148, 163, 184, 0.1);
+      color: #94a3b8;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .status-single {
+      background: rgba(56, 189, 248, 0.1);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .status-best {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+
+    /* ==========================================================================
+       Terminal Code Box
+       ========================================================================== */
+    .code-box {
+      background: #090d16;
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+
+    .terminal-header {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .terminal-dots {
+      display: flex;
+      gap: 7px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #eab308; }
+    .dot-green { background: #22c55e; }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    pre {
+      padding: 24px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: #e2e8f0;
+    }
+
+    code .cmd-comment { color: #64748b; }
+    code .cmd-action { color: #38bdf8; }
+    code .cmd-arg { color: #a5b4fc; }
+
+    /* ==========================================================================
+       Footer
+       ========================================================================== */
+    .footer {
+      border-top: 1px solid var(--card-border);
+      padding: 40px 0;
+      margin-top: 80px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .copyleft {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    /* Scroll animations trigger classes */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
 </head>
 <body>
-  <div class="background-glow"></div>
+  <!-- Neural Network Style Background Particles -->
+  <canvas id="particle-canvas"></canvas>
+
+  <div class="background-glow">
+    <div class="glow-blob glow-blob-1"></div>
+    <div class="glow-blob glow-blob-2"></div>
+    <div class="glow-blob glow-blob-3"></div>
+  </div>
   
   <header class="navbar">
     <div class="container nav-container">
@@ -26,7 +604,7 @@
   </header>
 
   <main class="container">
-    <section class="hero">
+    <section class="hero reveal">
       <div class="hero-content">
         <span class="pill-tag">Kaggle Competition Benchmark</span>
         <h1>Heavy Equipment Price Prediction</h1>
@@ -36,27 +614,27 @@
 
         <div class="stats-grid">
           <div class="stat-card">
-            <div class="stat-num">0.18663</div>
+            <div class="stat-num" data-target="0.18663" data-decimals="5">0.00000</div>
             <div class="stat-label">Validation RMSLE</div>
           </div>
           <div class="stat-card">
-            <div class="stat-num">5-Seed</div>
+            <div class="stat-num" data-target="5" data-suffix="-Seed">0</div>
             <div class="stat-label">Gradient Boost Ensemble</div>
           </div>
           <div class="stat-card">
-            <div class="stat-num">1.0013</div>
+            <div class="stat-num" data-target="1.0013" data-decimals="4">0.0000</div>
             <div class="stat-label">Jensen's Multiplier</div>
           </div>
           <div class="stat-card">
-            <div class="stat-num">90.00%</div>
+            <div class="stat-num" data-target="90.00" data-decimals="2" data-suffix="%">0%</div>
             <div class="stat-label">IIT Madras S-Grade</div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="card-section">
-      <h2>Architecture & Innovations</h2>
+    <section class="card-section reveal">
+      <h2>Architecture &amp; Innovations</h2>
       <div class="features-grid">
         <div class="feature-card">
           <div class="icon">⚡</div>
@@ -66,7 +644,7 @@
 
         <div class="feature-card">
           <div class="icon">⏳</div>
-          <h3>Temporal & Depreciation Ratios</h3>
+          <h3>Temporal &amp; Depreciation Ratios</h3>
           <p>Engineered non-linear interaction features including Machine Age at Sale, Operating Hours per Year, and Machine Age / Model Age ratios.</p>
         </div>
 
@@ -84,7 +662,7 @@
       </div>
     </section>
 
-    <section class="card-section">
+    <section class="card-section reveal">
       <h2>Benchmark Performance Comparison</h2>
       <div class="table-container">
         <table>
@@ -126,18 +704,29 @@
       </div>
     </section>
 
-    <section class="card-section">
+    <section class="card-section reveal">
       <h2>Quick Start</h2>
       <div class="code-box">
-        <pre><code># Clone local repository
-git clone https://github.com/24f3004027/Machine_Learning_Practice_Project.git
-cd Machine_Learning_Practice_Project
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <button class="copy-btn" id="copy-button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span>Copy</span>
+          </button>
+        </div>
+        <pre><code id="bash-code"><span class="cmd-comment"># Clone local repository</span>
+<span class="cmd-action">git clone</span> <span class="cmd-arg">https://github.com/24f3004027/Machine_Learning_Practice_Project.git</span>
+<span class="cmd-action">cd</span> Machine_Learning_Practice_Project
 
-# Install requirements
-pip install -r requirements.txt
+<span class="cmd-comment"># Install requirements</span>
+<span class="cmd-action">pip</span> install -r requirements.txt
 
-# Run Python module checks
-python3 -m py_compile src/feature_engineering.py src/preprocessing.py src/models.py src/evaluate.py</code></pre>
+<span class="cmd-comment"># Run Python module checks</span>
+<span class="cmd-action">python3</span> -m py_compile src/feature_engineering.py src/preprocessing.py src/models.py src/evaluate.py</code></pre>
       </div>
     </section>
   </main>
@@ -145,8 +734,197 @@ python3 -m py_compile src/feature_engineering.py src/preprocessing.py src/models
   <footer class="footer">
     <div class="container footer-content">
       <p class="copyleft">🄯 Copyleft 2026 Ramrup Satpati | All Rights Reversed</p>
-      <p class="license">IIT Madras BS Degree in Data Science & Applications | Released under GNU GPLv3</p>
+      <p class="license">IIT Madras BS Degree in Data Science &amp; Applications | Released under GNU GPLv3</p>
     </div>
   </footer>
+
+  <!-- ==========================================================================
+       Interactive Client-Side Engine
+       ========================================================================== -->
+  <script>
+    /* 1. Interactive Constellation Canvas Particle Background */
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+    const mouse = { x: null, y: null, maxDist: 140 };
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.7;
+        this.vy = (Math.random() - 0.5) * 0.7;
+        this.radius = Math.random() * 1.5 + 0.5;
+        this.baseAlpha = Math.random() * 0.5 + 0.2;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > width) this.vx = -this.vx;
+        if (this.y < 0 || this.y > height) this.vy = -this.vy;
+
+        // Interaction with cursor
+        if (mouse.x !== null && mouse.y !== null) {
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouse.maxDist) {
+            const force = (1 - dist / mouse.maxDist) * 1.2;
+            this.x -= (dx / dist) * force;
+            this.y -= (dy / dist) * force;
+          }
+        }
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(148, 163, 184, ${this.baseAlpha})`;
+        ctx.fill();
+      }
+    }
+
+    const particleCount = Math.min(Math.floor((window.innerWidth * window.innerHeight) / 12000), 100);
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, width, height);
+
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 110) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(99, 102, 241, ${0.15 * (1 - dist / 110)})`;
+            ctx.lineWidth = 0.8;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    window.addEventListener('mouseleave', () => {
+      mouse.x = null;
+      mouse.y = null;
+    });
+
+    /* 2. 3D Tilt Physics and Mouse Light Glare Effect on Feature Cards */
+    const cards = document.querySelectorAll('.feature-card, .stat-card');
+    cards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Set CSS variables for spotlight glow
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+
+        if (card.classList.contains('feature-card')) {
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = ((y - centerY) / centerY) * -8;
+          const rotateY = ((x - centerX) / centerX) * 8;
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+        }
+      });
+
+      card.addEventListener('mouseleave', () => {
+        if (card.classList.contains('feature-card')) {
+          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+        }
+      });
+    });
+
+    /* 3. Dynamic Number Counters with Ease-Out Animation */
+    const statElements = document.querySelectorAll('.stat-num');
+    let countersStarted = false;
+
+    function startCounters() {
+      statElements.forEach(el => {
+        const target = parseFloat(el.getAttribute('data-target'));
+        const decimals = parseInt(el.getAttribute('data-decimals') || 0, 10);
+        const suffix = el.getAttribute('data-suffix') || '';
+        const duration = 2000;
+        const startTime = performance.now();
+
+        function updateCounter(currentTime) {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          // Ease-out cubic calculation
+          const easeOut = 1 - Math.pow(1 - progress, 3);
+          const currentVal = target * easeOut;
+
+          el.textContent = currentVal.toFixed(decimals) + suffix;
+
+          if (progress < 1) {
+            requestAnimationFrame(updateCounter);
+          } else {
+            el.textContent = target.toFixed(decimals) + suffix;
+          }
+        }
+        requestAnimationFrame(updateCounter);
+      });
+    }
+
+    /* 4. Intersection Observer for Scroll Reveals */
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+          if (!countersStarted && entry.target.querySelector('.stat-num')) {
+            startCounters();
+            countersStarted = true;
+          }
+        }
+      });
+    }, { threshold: 0.15 });
+
+    reveals.forEach(el => observer.observe(el));
+
+    /* 5. Terminal Copy Button Interaction */
+    const copyBtn = document.getElementById('copy-button');
+    const codeSnippet = document.getElementById('bash-code');
+
+    copyBtn.addEventListener('click', () => {
+      const textToCopy = codeSnippet.innerText;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalHtml = copyBtn.innerHTML;
+        copyBtn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <span style="color:#34d399;">Copied!</span>
+        `;
+        setTimeout(() => {
+          copyBtn.innerHTML = originalHtml;
+        }, 2200);
+      });
+    });
+  </script>
 </body>
 </html>
