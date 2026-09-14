@@ -1,9 +1,10 @@
-numpy>=1.22.0
-pandas>=1.4.0
-scikit-learn>=1.0.0
-xgboost>=1.6.0
+# IIT Madras Machine Learning Practice (MLP) Project Dependencies
+numpy>=1.23.0
+pandas>=1.5.0
+scikit-learn>=1.2.0
+xgboost>=1.7.0
 lightgbm>=3.3.0
-catboost>=1.0.0
-matplotlib>=3.5.0
-seaborn>=0.11.0
-jupyterlab>=3.4.0
+catboost>=1.1.0
+matplotlib>=3.6.0
+seaborn>=0.12.0
+jupyter>=1.0.0
