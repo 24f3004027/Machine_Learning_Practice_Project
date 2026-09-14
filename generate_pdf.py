@@ -1,8 +1,3 @@
-"""
-🄯 Copyleft 2026 Ramrup Satpati | All Rights Reversed.
-Script to compile report.md into Technical_Report.pdf.
-"""
-
 import os
 import sys
 
