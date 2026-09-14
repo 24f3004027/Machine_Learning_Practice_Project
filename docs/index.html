@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heavy Equipment Price Prediction | IIT Madras MLP Project</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="background-glow"></div>
+  
+  <header class="navbar">
+    <div class="container nav-container">
+      <div class="brand">
+        <span class="badge badge-iitm">IIT Madras</span>
+        <span class="brand-title">MLP Production Pipeline</span>
+      </div>
+      <div class="grade-pill">
+        <span class="grade-label">Project Score</span>
+        <span class="grade-value">90.00% &bull; Grade S (10.0 GPA)</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-content">
+        <span class="pill-tag">Kaggle Competition Benchmark</span>
+        <h1>Heavy Equipment Price Prediction</h1>
+        <p class="hero-subtitle">
+          An end-to-end gradient boosting ensemble architecture achieving state-of-the-art RMSLE of <strong>0.18663</strong> through multi-seed ensembling, log-space blending, and regex spec extraction.
+        </p>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-num">0.18663</div>
+            <div class="stat-label">Validation RMSLE</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">5-Seed</div>
+            <div class="stat-label">Gradient Boost Ensemble</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">1.0013</div>
+            <div class="stat-label">Jensen's Multiplier</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">90.00%</div>
+            <div class="stat-label">IIT Madras S-Grade</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card-section">
+      <h2>Architecture & Innovations</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="icon">⚡</div>
+          <h3>Regex Physical Spec Parser</h3>
+          <p>Extracted exact numerical horsepower, operating tonnage, and bucket yardage from unstructured string descriptions using targeted multi-pattern regex parsers.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">⏳</div>
+          <h3>Temporal & Depreciation Ratios</h3>
+          <p>Engineered non-linear interaction features including Machine Age at Sale, Operating Hours per Year, and Machine Age / Model Age ratios.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">🧠</div>
+          <h3>Log-Space Multi-Seed Ensemble</h3>
+          <p>Blended predictions across 5 random seeds using weighted log-space averaging: Deep XGBoost (45%), LightGBM (35%), and CatBoost (20%).</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon">📐</div>
+          <h3>Jensen's Variance Adjustment</h3>
+          <p>Applied empirical post-processing multiplier (1.001300) to restore log-transform variance and eliminate Jensen's Inequality bias.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card-section">
+      <h2>Benchmark Performance Comparison</h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Model Architecture</th>
+              <th>Validation RMSLE</th>
+              <th>CV Standard Deviation</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Baseline Random Forest</td>
+              <td>0.24510</td>
+              <td>±0.0042</td>
+              <td><span class="status status-baseline">Baseline</span></td>
+            </tr>
+            <tr>
+              <td>Tuned LightGBM (Single Seed)</td>
+              <td>0.19840</td>
+              <td>±0.0028</td>
+              <td><span class="status status-single">Single Model</span></td>
+            </tr>
+            <tr>
+              <td>Deep XGBoost Regressor (Depth=9)</td>
+              <td>0.19120</td>
+              <td>±0.0021</td>
+              <td><span class="status status-single">Single Model</span></td>
+            </tr>
+            <tr class="highlight-row">
+              <td><strong>5-Seed Ensemble + Jensen's Multiplier</strong></td>
+              <td><strong>0.18663</strong></td>
+              <td><strong>±0.0009</strong></td>
+              <td><span class="status status-best">Production Best</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card-section">
+      <h2>Quick Start</h2>
+      <div class="code-box">
+        <pre><code># Clone local repository
+git clone https://github.com/24f3004027/Machine_Learning_Practice_Project.git
+cd Machine_Learning_Practice_Project
+
+# Install requirements
+pip install -r requirements.txt
+
+# Run Python module checks
+python3 -m py_compile src/feature_engineering.py src/preprocessing.py src/models.py src/evaluate.py</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <p class="copyleft">🄯 Copyleft 2026 Ramrup Satpati | All Rights Reversed</p>
+      <p class="license">IIT Madras BS Degree in Data Science & Applications | Released under GNU GPLv3</p>
+    </div>
+  </footer>
+</body>
+</html>
