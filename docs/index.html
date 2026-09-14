@@ -12,22 +12,22 @@
 
   <style>
     /* ==========================================================================
-       CSS Variables & Modern Reset
+       LIGHT THEME PALETTE & VARIABLES
        ========================================================================== */
     :root {
-      --bg: #030712;
-      --card-bg: rgba(15, 23, 42, 0.65);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --card-border-hover: rgba(99, 102, 241, 0.4);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --accent-cyan: #38bdf8;
-      --accent-indigo: #6366f1;
-      --accent-emerald: #10b981;
-      --accent-rose: #f43f5e;
-      --gradient-accent: linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
+      --bg: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.78);
+      --card-border: rgba(226, 232, 240, 0.9);
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --accent-blue: #0284c7;
+      --accent-indigo: #4f46e5;
+      --accent-purple: #9333ea;
+      --accent-emerald: #059669;
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 20px 30px -10px rgba(79, 70, 229, 0.12), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }
 
     *, *::before, *::after {
@@ -44,71 +44,66 @@
       line-height: 1.6;
       overflow-x: hidden;
       position: relative;
-      perspective: 1000px;
     }
 
-    /* Interactive Canvas Background */
-    #particle-canvas {
+    /* Ambient Animated Blobs (Light Pastels) */
+    .ambient-mesh {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      inset: 0;
+      overflow: hidden;
       z-index: 0;
       pointer-events: none;
     }
 
-    /* Ambient Dynamic Mesh Glows */
-    .background-glow {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      pointer-events: none;
-      overflow: hidden;
-    }
-
-    .glow-blob {
+    .mesh-ball {
       position: absolute;
-      width: 600px;
-      height: 600px;
       border-radius: 50%;
-      filter: blur(120px);
-      opacity: 0.22;
-      mix-blend-mode: screen;
-      animation: floatMesh 20s infinite alternate ease-in-out;
+      filter: blur(90px);
+      opacity: 0.55;
+      animation: floatMesh 18s ease-in-out infinite alternate;
     }
 
-    .glow-blob-1 {
+    .ball-1 {
+      width: 500px;
+      height: 500px;
       top: -10%;
-      left: 10%;
-      background: radial-gradient(circle, #6366f1, transparent 70%);
+      left: -5%;
+      background: linear-gradient(135deg, #c7d2fe, #e0e7ff);
     }
 
-    .glow-blob-2 {
-      bottom: 10%;
-      right: 5%;
-      background: radial-gradient(circle, #38bdf8, transparent 70%);
-      animation-delay: -7s;
+    .ball-2 {
+      width: 550px;
+      height: 550px;
+      top: 35%;
+      right: -8%;
+      background: linear-gradient(135deg, #bae6fd, #e0f2fe);
+      animation-delay: -6s;
     }
 
-    .glow-blob-3 {
-      top: 40%;
-      right: 30%;
-      background: radial-gradient(circle, #a855f7, transparent 70%);
-      animation-delay: -12s;
+    .ball-3 {
+      width: 450px;
+      height: 450px;
+      bottom: -10%;
+      left: 25%;
+      background: linear-gradient(135deg, #fbcfe8, #ede9fe);
+      animation-delay: -11s;
     }
 
     @keyframes floatMesh {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(80px, 60px) scale(1.15); }
-      100% { transform: translate(-60px, -40px) scale(0.9); }
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      50% { transform: translate(90px, 60px) scale(1.15) rotate(90deg); }
+      100% { transform: translate(-70px, -50px) scale(0.9) rotate(180deg); }
+    }
+
+    #interactive-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1180px;
       margin: 0 auto;
       padding: 0 24px;
       position: relative;
@@ -116,18 +111,18 @@
     }
 
     /* ==========================================================================
-       Glassmorphic Navbar
+       NAVBAR
        ========================================================================== */
     .navbar {
       position: sticky;
       top: 0;
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      background: rgba(3, 7, 18, 0.7);
-      border-bottom: 1px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(255, 255, 255, 0.75);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
       z-index: 100;
       padding: 14px 0;
-      transition: border-color 0.3s ease;
+      transition: all 0.3s ease;
     }
 
     .nav-container {
@@ -145,39 +140,44 @@
     }
 
     .badge-iitm {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
-      border: 1px solid rgba(168, 85, 247, 0.4);
-      color: #c084fc;
+      background: linear-gradient(135deg, #e0e7ff, #ede9fe);
+      border: 1px solid #c7d2fe;
+      color: var(--accent-indigo);
       font-size: 0.75rem;
       font-weight: 700;
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 9999px;
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
+      box-shadow: 0 2px 8px rgba(79, 70, 229, 0.15);
+      animation: badgePulse 3s infinite alternate;
+    }
+
+    @keyframes badgePulse {
+      0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.2); }
+      100% { box-shadow: 0 0 0 6px rgba(79, 70, 229, 0); }
     }
 
     .brand-title {
-      font-weight: 600;
+      font-weight: 700;
       font-size: 0.95rem;
       color: var(--text-main);
-      letter-spacing: -0.01em;
     }
 
     .grade-pill {
       display: flex;
       align-items: center;
       gap: 10px;
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #a7f3d0;
       padding: 6px 14px;
       border-radius: 9999px;
-      box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
-      animation: pulseBorder 4s infinite alternate ease-in-out;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.08);
+      animation: bounceSubtle 4s infinite ease-in-out;
     }
 
     .grade-label {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
       color: var(--text-muted);
       font-weight: 600;
@@ -191,18 +191,17 @@
       font-family: var(--font-mono);
     }
 
-    @keyframes pulseBorder {
-      0% { border-color: rgba(16, 185, 129, 0.2); box-shadow: 0 0 10px rgba(16, 185, 129, 0.1); }
-      100% { border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 0 20px rgba(16, 185, 129, 0.25); }
+    @keyframes bounceSubtle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
     }
 
     /* ==========================================================================
-       Hero Section
+       HERO & DYNAMIC TEXT
        ========================================================================== */
     .hero {
-      padding: 90px 0 60px;
+      padding: 85px 0 50px;
       text-align: center;
-      position: relative;
     }
 
     .pill-tag {
@@ -211,44 +210,58 @@
       font-weight: 600;
       padding: 6px 18px;
       border-radius: 9999px;
-      background: rgba(56, 189, 248, 0.1);
-      color: var(--accent-cyan);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: #e0f2fe;
+      color: var(--accent-blue);
+      border: 1px solid #bae6fd;
       margin-bottom: 24px;
       letter-spacing: 0.04em;
       text-transform: uppercase;
+      animation: floatTag 3s infinite ease-in-out alternate;
+    }
+
+    @keyframes floatTag {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-4px); }
     }
 
     .hero h1 {
-      font-size: clamp(2.5rem, 5.5vw, 4.2rem);
+      font-size: clamp(2.4rem, 5.5vw, 4.1rem);
       font-weight: 800;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.035em;
       line-height: 1.15;
-      margin-bottom: 24px;
-      background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%);
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #0f172a 30%, #4f46e5 70%, #0284c7 100%);
+      background-size: 200% auto;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      animation: shineText 8s ease infinite;
+    }
+
+    @keyframes shineText {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .hero-subtitle {
       max-width: 780px;
       margin: 0 auto 50px;
-      font-size: clamp(1rem, 2vw, 1.2rem);
+      font-size: clamp(1rem, 2vw, 1.15rem);
       color: var(--text-muted);
-      font-weight: 400;
       line-height: 1.7;
     }
 
     .hero-subtitle strong {
-      color: #ffffff;
+      color: var(--accent-indigo);
       font-family: var(--font-mono);
       font-weight: 600;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.07);
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: #eef2ff;
+      border: 1px solid #e0e7ff;
     }
 
-    /* Stats Grid */
+    /* Stats Cards with Light Glare */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -259,44 +272,46 @@
     .stat-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 24px;
+      box-shadow: var(--shadow-sm);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      transform-style: preserve-3d;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
       overflow: hidden;
+      transform-style: preserve-3d;
     }
 
     .stat-card:hover {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 12px 30px -10px rgba(56, 189, 248, 0.3);
+      transform: translateY(-6px) scale(1.02);
+      border-color: #c7d2fe;
+      box-shadow: var(--shadow-lg);
     }
 
     .stat-num {
       font-family: var(--font-mono);
-      font-size: 2.2rem;
-      font-weight: 700;
-      background: var(--gradient-accent);
+      font-size: 2.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #4f46e5, #0284c7);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .stat-label {
       color: var(--text-muted);
-      font-size: 0.85rem;
-      font-weight: 500;
+      font-size: 0.8rem;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
 
     /* ==========================================================================
-       Sections & Cards
+       FEATURES / INNOVATIONS CARDS (MAGNETIC 3D + SPOTLIGHT)
        ========================================================================== */
     .card-section {
-      padding: 60px 0;
+      padding: 50px 0;
     }
 
     .card-section h2 {
@@ -312,9 +327,9 @@
     .card-section h2::before {
       content: '';
       display: inline-block;
-      width: 4px;
+      width: 5px;
       height: 24px;
-      background: var(--gradient-accent);
+      background: linear-gradient(to bottom, #4f46e5, #0284c7);
       border-radius: 4px;
     }
 
@@ -327,30 +342,36 @@
     .feature-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 18px;
+      border-radius: 20px;
       padding: 32px 24px;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      transition: transform 0.2s cubic-bezier(0.1, 1, 0.1, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+      box-shadow: var(--shadow-sm);
       position: relative;
       overflow: hidden;
+      transition: transform 0.15s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
       transform-style: preserve-3d;
       will-change: transform;
+    }
+
+    .feature-card:hover {
+      border-color: #818cf8;
+      box-shadow: var(--shadow-lg);
     }
 
     /* Mouse Follow Spot-Glare */
     .feature-card::before {
       content: '';
       position: absolute;
-      top: var(--mouse-y, -1000px);
-      left: var(--mouse-x, -1000px);
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle closest-side, rgba(99, 102, 241, 0.18), transparent 80%);
+      top: var(--mouse-y, -500px);
+      left: var(--mouse-x, -500px);
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle closest-side, rgba(99, 102, 241, 0.12), transparent 80%);
       transform: translate(-50%, -50%);
       pointer-events: none;
-      transition: opacity 0.3s ease;
       opacity: 0;
+      transition: opacity 0.3s ease;
     }
 
     .feature-card:hover::before {
@@ -358,58 +379,84 @@
     }
 
     .feature-card .icon {
-      font-size: 2.2rem;
+      font-size: 2.1rem;
       margin-bottom: 20px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 54px;
-      height: 54px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transform: translateZ(25px);
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      animation: floatIcon 4s ease-in-out infinite alternate;
+    }
+
+    .feature-card:nth-child(2) .icon { animation-delay: -1s; }
+    .feature-card:nth-child(3) .icon { animation-delay: -2s; }
+    .feature-card:nth-child(4) .icon { animation-delay: -3s; }
+
+    @keyframes floatIcon {
+      0% { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(-7px) rotate(4deg); }
     }
 
     .feature-card h3 {
       font-size: 1.15rem;
       margin-bottom: 12px;
-      font-weight: 600;
-      color: #fff;
-      transform: translateZ(20px);
+      font-weight: 700;
+      color: var(--text-main);
     }
 
     .feature-card p {
       color: var(--text-muted);
-      font-size: 0.9rem;
+      font-size: 0.92rem;
       line-height: 1.6;
-      transform: translateZ(10px);
     }
 
     /* ==========================================================================
-       Table Performance
+       RADAR SCANNER TABLE
        ========================================================================== */
     .table-container {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
-      overflow-x: auto;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+      position: relative;
+    }
+
+    /* Radar scan light beam */
+    .table-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.08), transparent);
+      animation: radarScan 6s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes radarScan {
+      0% { left: -60%; }
+      50%, 100% { left: 120%; }
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
-      font-size: 0.95rem;
     }
 
     th {
-      background: rgba(255, 255, 255, 0.02);
-      padding: 18px 24px;
-      color: var(--text-muted);
-      font-weight: 600;
+      background: #f1f5f9;
+      padding: 16px 24px;
+      color: #334155;
+      font-weight: 700;
       text-transform: uppercase;
       font-size: 0.75rem;
       letter-spacing: 0.05em;
@@ -418,7 +465,7 @@
 
     td {
       padding: 18px 24px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid #f1f5f9;
       color: var(--text-muted);
       font-family: var(--font-mono);
       font-size: 0.9rem;
@@ -427,28 +474,32 @@
     td:first-child {
       font-family: var(--font-sans);
       color: var(--text-main);
-      font-weight: 500;
+      font-weight: 600;
     }
 
     tbody tr {
-      transition: background-color 0.25s ease, transform 0.2s ease;
+      transition: all 0.25s ease;
     }
 
     tbody tr:hover {
-      background: rgba(255, 255, 255, 0.04);
+      background: #f8fafc;
+      transform: scale(1.002);
     }
 
     .highlight-row {
-      background: rgba(99, 102, 241, 0.08) !important;
-      border-left: 3px solid var(--accent-indigo);
+      background: #f5f3ff !important;
+      border-left: 4px solid var(--accent-indigo);
     }
 
     .highlight-row td {
-      color: #fff;
+      color: var(--accent-indigo);
+      font-weight: 700;
     }
 
     .status {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       font-size: 0.75rem;
       font-weight: 600;
       padding: 4px 10px;
@@ -457,39 +508,52 @@
     }
 
     .status-baseline {
-      background: rgba(148, 163, 184, 0.1);
-      color: #94a3b8;
-      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: #f1f5f9;
+      color: #64748b;
+      border: 1px solid #cbd5e1;
     }
 
     .status-single {
-      background: rgba(56, 189, 248, 0.1);
-      color: #38bdf8;
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: #e0f2fe;
+      color: #0284c7;
+      border: 1px solid #bae6fd;
     }
 
     .status-best {
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border: 1px solid rgba(52, 211, 153, 0.4);
-      box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+      background: #dcfce7;
+      color: #059669;
+      border: 1px solid #86efac;
+      box-shadow: 0 2px 8px rgba(5, 150, 105, 0.15);
+    }
+
+    .status-best::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      background: #059669;
+      border-radius: 50%;
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
     }
 
     /* ==========================================================================
-       Terminal Code Box
+       INTERACTIVE LIVE TERMINAL
        ========================================================================== */
     .code-box {
-      background: #090d16;
+      background: #ffffff;
       border: 1px solid var(--card-border);
-      border-radius: 14px;
+      border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6);
-      position: relative;
+      box-shadow: var(--shadow-lg);
     }
 
     .terminal-header {
-      background: rgba(255, 255, 255, 0.03);
-      padding: 12px 18px;
+      background: #f8fafc;
+      padding: 14px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -498,37 +562,44 @@
 
     .terminal-dots {
       display: flex;
-      gap: 7px;
+      gap: 8px;
     }
 
     .dot {
-      width: 10px;
-      height: 10px;
+      width: 11px;
+      height: 11px;
       border-radius: 50%;
     }
 
-    .dot-red { background: #ef4444; }
-    .dot-yellow { background: #eab308; }
-    .dot-green { background: #22c55e; }
+    .dot-red { background: #f87171; }
+    .dot-yellow { background: #facc15; }
+    .dot-green { background: #4ade80; }
 
-    .copy-btn {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--text-muted);
-      padding: 4px 12px;
+    .terminal-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .term-btn {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+      padding: 5px 12px;
       font-size: 0.75rem;
+      font-weight: 600;
       border-radius: 6px;
       cursor: pointer;
       font-family: var(--font-sans);
+      transition: all 0.2s ease;
       display: flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
+      gap: 5px;
     }
 
-    .copy-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
-      color: #fff;
+    .term-btn:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+      border-color: #94a3b8;
     }
 
     pre {
@@ -536,16 +607,28 @@
       overflow-x: auto;
       font-family: var(--font-mono);
       font-size: 0.88rem;
-      line-height: 1.7;
-      color: #e2e8f0;
+      line-height: 1.8;
+      color: #334155;
+      min-height: 180px;
     }
 
-    code .cmd-comment { color: #64748b; }
-    code .cmd-action { color: #38bdf8; }
-    code .cmd-arg { color: #a5b4fc; }
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 16px;
+      background: var(--accent-indigo);
+      margin-left: 3px;
+      vertical-align: middle;
+      animation: cursorBlink 0.8s infinite;
+    }
+
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
 
     /* ==========================================================================
-       Footer
+       FOOTER
        ========================================================================== */
     .footer {
       border-top: 1px solid var(--card-border);
@@ -554,6 +637,7 @@
       font-size: 0.85rem;
       color: var(--text-muted);
       text-align: center;
+      background: rgba(255, 255, 255, 0.4);
     }
 
     .footer-content {
@@ -564,13 +648,13 @@
 
     .copyleft {
       color: var(--text-main);
-      font-weight: 500;
+      font-weight: 600;
     }
 
-    /* Scroll animations trigger classes */
+    /* Staggered Scroll Reveal */
     .reveal {
       opacity: 0;
-      transform: translateY(30px);
+      transform: translateY(35px);
       transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -581,15 +665,17 @@
   </style>
 </head>
 <body>
-  <!-- Neural Network Style Background Particles -->
-  <canvas id="particle-canvas"></canvas>
 
-  <div class="background-glow">
-    <div class="glow-blob glow-blob-1"></div>
-    <div class="glow-blob glow-blob-2"></div>
-    <div class="glow-blob glow-blob-3"></div>
+  <!-- Ambient Light Mesh Background -->
+  <div class="ambient-mesh">
+    <div class="mesh-ball ball-1"></div>
+    <div class="mesh-ball ball-2"></div>
+    <div class="mesh-ball ball-3"></div>
   </div>
-  
+
+  <!-- Interactive Network Canvas -->
+  <canvas id="interactive-canvas"></canvas>
+
   <header class="navbar">
     <div class="container nav-container">
       <div class="brand">
@@ -606,7 +692,7 @@
   <main class="container">
     <section class="hero reveal">
       <div class="hero-content">
-        <span class="pill-tag">Kaggle Competition Benchmark</span>
+        <span class="pill-tag">⚡ Kaggle Competition Benchmark</span>
         <h1>Heavy Equipment Price Prediction</h1>
         <p class="hero-subtitle">
           An end-to-end gradient boosting ensemble architecture achieving state-of-the-art RMSLE of <strong>0.18663</strong> through multi-seed ensembling, log-space blending, and regex spec extraction.
@@ -713,20 +799,16 @@
             <span class="dot dot-yellow"></span>
             <span class="dot dot-green"></span>
           </div>
-          <button class="copy-btn" id="copy-button">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-            <span>Copy</span>
-          </button>
+          <div class="terminal-controls">
+            <button class="term-btn" id="replay-type-btn">
+              <span>▶ Replay</span>
+            </button>
+            <button class="term-btn" id="copy-button">
+              <span>Copy</span>
+            </button>
+          </div>
         </div>
-        <pre><code id="bash-code"><span class="cmd-comment"># Clone local repository</span>
-<span class="cmd-action">git clone</span> <span class="cmd-arg">https://github.com/24f3004027/Machine_Learning_Practice_Project.git</span>
-<span class="cmd-action">cd</span> Machine_Learning_Practice_Project
-
-<span class="cmd-comment"># Install requirements</span>
-<span class="cmd-action">pip</span> install -r requirements.txt
-
-<span class="cmd-comment"># Run Python module checks</span>
-<span class="cmd-action">python3</span> -m py_compile src/feature_engineering.py src/preprocessing.py src/models.py src/evaluate.py</code></pre>
+        <pre><code id="typewriter-area"></code><span class="cursor"></span></pre>
       </div>
     </section>
   </main>
@@ -739,67 +821,112 @@
   </footer>
 
   <!-- ==========================================================================
-       Interactive Client-Side Engine
+       ANIMATION LOGIC & CLIENT SCRIPTS
        ========================================================================== -->
   <script>
-    /* 1. Interactive Constellation Canvas Particle Background */
-    const canvas = document.getElementById('particle-canvas');
+    /* --------------------------------------------------------------------------
+       1. Light-Themed Particle Constellation & Ripple Physics
+       -------------------------------------------------------------------------- */
+    const canvas = document.getElementById('interactive-canvas');
     const ctx = canvas.getContext('2d');
     let width, height;
     let particles = [];
-    const mouse = { x: null, y: null, maxDist: 140 };
+    let ripples = [];
+    const mouse = { x: null, y: null };
 
-    function resizeCanvas() {
+    function resize() {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
     }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    window.addEventListener('resize', resize);
+    resize();
 
     class Particle {
       constructor() {
+        this.reset();
+      }
+      reset() {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.vx = (Math.random() - 0.5) * 0.7;
-        this.vy = (Math.random() - 0.5) * 0.7;
-        this.radius = Math.random() * 1.5 + 0.5;
-        this.baseAlpha = Math.random() * 0.5 + 0.2;
+        this.vx = (Math.random() - 0.5) * 0.9;
+        this.vy = (Math.random() - 0.5) * 0.9;
+        this.radius = Math.random() * 2 + 1;
       }
       update() {
         this.x += this.vx;
         this.y += this.vy;
 
-        if (this.x < 0 || this.x > width) this.vx = -this.vx;
-        if (this.y < 0 || this.y > height) this.vy = -this.vy;
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
 
-        // Interaction with cursor
-        if (mouse.x !== null && mouse.y !== null) {
+        if (mouse.x !== null) {
           const dx = mouse.x - this.x;
           const dy = mouse.y - this.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < mouse.maxDist) {
-            const force = (1 - dist / mouse.maxDist) * 1.2;
-            this.x -= (dx / dist) * force;
-            this.y -= (dy / dist) * force;
+          if (dist < 120) {
+            this.x -= (dx / dist) * 1.5;
+            this.y -= (dy / dist) * 1.5;
           }
         }
       }
       draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(148, 163, 184, ${this.baseAlpha})`;
+        ctx.fillStyle = 'rgba(99, 102, 241, 0.35)';
         ctx.fill();
       }
     }
 
-    const particleCount = Math.min(Math.floor((window.innerWidth * window.innerHeight) / 12000), 100);
-    for (let i = 0; i < particleCount; i++) {
-      particles.push(new Particle());
+    class Ripple {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.radius = 1;
+        this.alpha = 0.5;
+      }
+      update() {
+        this.radius += 2.5;
+        this.alpha -= 0.015;
+      }
+      draw() {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(14, 165, 233, ${this.alpha})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.restore();
+      }
     }
 
-    function animateParticles() {
+    const particleCount = Math.min(Math.floor((window.innerWidth * window.innerHeight) / 14000), 75);
+    for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+
+      if (Math.random() > 0.85) {
+        ripples.push(new Ripple(e.clientX, e.clientY));
+      }
+    });
+
+    window.addEventListener('mouseleave', () => {
+      mouse.x = null;
+      mouse.y = null;
+    });
+
+    function runNetwork() {
       ctx.clearRect(0, 0, width, height);
 
+      // Render & cycle ripples
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        ripples[i].update();
+        ripples[i].draw();
+        if (ripples[i].alpha <= 0) ripples.splice(i, 1);
+      }
+
+      // Render & link particles
       for (let i = 0; i < particles.length; i++) {
         particles[i].update();
         particles[i].draw();
@@ -811,59 +938,49 @@
 
           if (dist < 110) {
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(99, 102, 241, ${0.15 * (1 - dist / 110)})`;
-            ctx.lineWidth = 0.8;
+            ctx.strokeStyle = `rgba(147, 197, 253, ${0.45 * (1 - dist / 110)})`;
+            ctx.lineWidth = 0.9;
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
             ctx.stroke();
           }
         }
       }
-      requestAnimationFrame(animateParticles);
+      requestAnimationFrame(runNetwork);
     }
-    animateParticles();
+    runNetwork();
 
-    window.addEventListener('mousemove', (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    });
-
-    window.addEventListener('mouseleave', () => {
-      mouse.x = null;
-      mouse.y = null;
-    });
-
-    /* 2. 3D Tilt Physics and Mouse Light Glare Effect on Feature Cards */
-    const cards = document.querySelectorAll('.feature-card, .stat-card');
-    cards.forEach(card => {
+    /* --------------------------------------------------------------------------
+       2. 3D Tilt & Spot-Glare Physics
+       -------------------------------------------------------------------------- */
+    const featureCards = document.querySelectorAll('.feature-card');
+    featureCards.forEach(card => {
       card.addEventListener('mousemove', (e) => {
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        // Set CSS variables for spotlight glow
         card.style.setProperty('--mouse-x', `${x}px`);
         card.style.setProperty('--mouse-y', `${y}px`);
 
-        if (card.classList.contains('feature-card')) {
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-          const rotateX = ((y - centerY) / centerY) * -8;
-          const rotateY = ((x - centerX) / centerX) * 8;
-          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
-        }
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -10;
+        const rotateY = ((x - centerX) / centerX) * 10;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
       });
 
       card.addEventListener('mouseleave', () => {
-        if (card.classList.contains('feature-card')) {
-          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
-        }
+        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
       });
     });
 
-    /* 3. Dynamic Number Counters with Ease-Out Animation */
+    /* --------------------------------------------------------------------------
+       3. Dynamic Rolling Counters
+       -------------------------------------------------------------------------- */
     const statElements = document.querySelectorAll('.stat-num');
-    let countersStarted = false;
+    let countersFired = false;
 
     function startCounters() {
       statElements.forEach(el => {
@@ -892,37 +1009,75 @@
       });
     }
 
-    /* 4. Intersection Observer for Scroll Reveals */
+    /* --------------------------------------------------------------------------
+       4. Staggered Scroll Observer
+       -------------------------------------------------------------------------- */
     const reveals = document.querySelectorAll('.reveal');
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('active');
-          if (!countersStarted && entry.target.querySelector('.stat-num')) {
+          if (!countersFired && entry.target.querySelector('.stat-num')) {
             startCounters();
-            countersStarted = true;
+            countersFired = true;
           }
         }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.1 });
 
     reveals.forEach(el => observer.observe(el));
 
-    /* 5. Terminal Copy Button Interaction */
-    const copyBtn = document.getElementById('copy-button');
-    const codeSnippet = document.getElementById('bash-code');
+    /* --------------------------------------------------------------------------
+       5. Animated Typewriter Terminal
+       -------------------------------------------------------------------------- */
+    const codeSnippet = `# Clone local repository
+git clone https://github.com/24f3004027/Machine_Learning_Practice_Project.git
+cd Machine_Learning_Practice_Project
 
+# Install requirements
+pip install -r requirements.txt
+
+# Run Python module checks
+python3 -m py_compile src/feature_engineering.py src/preprocessing.py src/models.py src/evaluate.py`;
+
+    const typewriterArea = document.getElementById('typewriter-area');
+    let typeIndex = 0;
+    let typeTimer = null;
+
+    function typeCode() {
+      typewriterArea.textContent = "";
+      typeIndex = 0;
+      clearInterval(typeTimer);
+
+      typeTimer = setInterval(() => {
+        typewriterArea.textContent = codeSnippet.substring(0, typeIndex);
+        typeIndex++;
+        if (typeIndex > codeSnippet.length) {
+          clearInterval(typeTimer);
+        }
+      }, 15);
+    }
+
+    // Auto-trigger typewriter when section approaches
+    const termObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && typewriterArea.textContent === "") {
+          typeCode();
+        }
+      });
+    }, { threshold: 0.2 });
+    termObserver.observe(typewriterArea);
+
+    document.getElementById('replay-type-btn').addEventListener('click', typeCode);
+
+    // Copy to clipboard
+    const copyBtn = document.getElementById('copy-button');
     copyBtn.addEventListener('click', () => {
-      const textToCopy = codeSnippet.innerText;
-      navigator.clipboard.writeText(textToCopy).then(() => {
-        const originalHtml = copyBtn.innerHTML;
-        copyBtn.innerHTML = `
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          <span style="color:#34d399;">Copied!</span>
-        `;
+      navigator.clipboard.writeText(codeSnippet).then(() => {
+        copyBtn.textContent = 'Copied!';
         setTimeout(() => {
-          copyBtn.innerHTML = originalHtml;
-        }, 2200);
+          copyBtn.textContent = 'Copy';
+        }, 2000);
       });
     });
   </script>
