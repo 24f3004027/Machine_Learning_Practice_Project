@@ -8,6 +8,15 @@
 
 ---
 
+## 📽️ Project Introduction & Video Overview
+
+> [!NOTE]  
+> A detailed audio-visual walkthrough of the 5-seed GBDT ensembling pipeline, regex physical specification parsing, and Jensen's inequality bias correction (`1.001300`).
+
+![Project Introduction Video](Project_Introduction.mp4)
+
+---
+
 ## 📌 Executive Walkthrough
 
 This document outlines the step-by-step verification and workflow execution for the Heavy Equipment Price Prediction pipeline.
