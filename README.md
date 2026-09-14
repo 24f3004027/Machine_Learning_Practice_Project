@@ -19,8 +19,20 @@ Predicting heavy equipment valuation requires modeling non-linear physical depre
 
 1. **Domain-Specific Feature Engineering**: Temporal extraction (epochs/years), regex-based physical capacity parsing (horsepower, tonnage, yardage), and non-linear usage-to-age depreciation ratios.
 2. **Native Categorical Processing**: Frequency encoding and pandas `category` dtype mapping for memory-efficient GBDT binning without high-cardinality dimensionality explosion.
-3. **5-Seed Multifold GBDT Ensembling**: A 3-way weighted ensemble combining **Deep XGBoost** ($75\%$), **LightGBM** ($10\%$), and **CatBoost** ($15\%$) trained across 5 random seeds to cancel out tree variance.
+3. **5-Seed Multifold GBDT Ensembling**: A 3-way weighted ensemble combining **Deep XGBoost** ($45\%$), **LightGBM** ($35\%$), and **CatBoost** ($20\%$) trained across 5 random seeds to cancel out tree variance.
 4. **Jensen's Inequality Bias Correction**: Log-space prediction averaging followed by exponential transformation (`expm1`) and scalar multiplier tuning (`1.001300`) to correct for the systematic downward prediction bias of log-transformed targets.
+
+---
+
+## 🏗️ Milestone Development & Git Branch History
+
+| Milestone | Feature Branch | Notebook File | Objective |
+| :--- | :--- | :--- | :--- |
+| **Milestone 1** | `feature/milestone-1-eda` | [`01_Exploratory_Data_Analysis.ipynb`](notebooks/01_Exploratory_Data_Analysis.ipynb) | Exploratory Data Analysis & Target Log-Distribution Modeling |
+| **Milestone 2** | `feature/milestone-2-spec-parsing` | [`02_Spec_Parsing_And_Baselines.ipynb`](notebooks/02_Spec_Parsing_And_Baselines.ipynb) | Regex Physical Specification Parsing & Baseline Models |
+| **Milestone 3** | `feature/milestone-3-feature-engineering` | [`03_Feature_Engineering_And_Encoding.ipynb`](notebooks/03_Feature_Engineering_And_Encoding.ipynb) | Domain Feature Engineering & Out-of-Fold Frequency Encoding |
+| **Milestone 4** | `feature/milestone-4-model-tuning` | [`04_Multi_Model_Gradient_Boosting.ipynb`](notebooks/04_Multi_Model_Gradient_Boosting.ipynb) | Multi-Model GBDT Hyperparameter Tuning (XGBoost, LGBM, CatBoost) |
+| **Milestone 5** | `feature/milestone-5-ensemble-jensen` | [`05_Production_Ensemble_And_Jensens_Multiplier.ipynb`](notebooks/05_Production_Ensemble_And_Jensens_Multiplier.ipynb) | 5-Seed Log-Space Blending & Jensen's Multiplier (`1.001300`) |
 
 ---
 
@@ -37,11 +49,11 @@ graph TD
 
     subgraph 2. Validation & Model Training
         CatFreq --> ValSplit["85 / 15 Train-Validation Split"]
-        ValSplit --> SeedLoop["5-Seed Training Loop<br/>(Seeds: 42, 2025, 7, 999, 1984)"]
+        ValSplit --> SeedLoop["5-Seed Training Loop<br/>(Seeds: 42, 100, 2026, 777, 999)"]
         
-        SeedLoop --> DeepXGB["Deep XGBoost (75%)<br/>(Max Depth 11, lr 0.025, reg_lambda 5.0)"]
-        SeedLoop --> LGBM["LightGBM Regressor (10%)<br/>(Max Depth 9, num_leaves 128)"]
-        SeedLoop --> CatB["CatBoost Regressor (15%)<br/>(Depth 6, l2_leaf_reg 5)"]
+        SeedLoop --> DeepXGB["Deep XGBoost (45%)<br/>(Max Depth 9, lr 0.015)"]
+        SeedLoop --> LGBM["LightGBM Regressor (35%)<br/>(Num Leaves 127, lr 0.012)"]
+        SeedLoop --> CatB["CatBoost Regressor (20%)<br/>(Depth 8, lr 0.02)"]
     end
 
     subgraph 3. Blending & Bias Correction
@@ -52,7 +64,7 @@ graph TD
         LogBlend --> Antilog["expm1 Inverse Transformation"]
         Antilog --> Multiplier["Jensen's Inequality Multiplier<br/>(1.001300)"]
         Multiplier --> BoundaryClip["Boundary Envelope Clipping"]
-        BoundaryClip --> FinalSub["Final Submission Output<br/>(submission.csv)"]
+        BoundaryClip --> FinalSub["Final Submission Output"]
     end
 ```
 
@@ -60,13 +72,12 @@ graph TD
 
 ## 📊 Key Results & Model Performance
 
-| Model Architecture | Features Used | Validation RMSLE | Kaggle Public Leaderboard |
+| Model Architecture | Features Used | Validation RMSLE | Status |
 | :--- | :--- | :---: | :---: |
-| **Baseline LightGBM** | Default features | `0.19420` | ~`0.1925` |
-| **Shallow XGBoost (Depth 13)** | Basic ratios + frequency | `0.19050` | ~`0.1895` |
-| **LightGBM (Depth 14, Leaves 512)** | Full interaction set | `0.18950` | ~`0.1888` |
-| **Deep XGBoost (Depth 17)** | High-depth interaction trees | `0.18880` | ~`0.1872` |
-| **Production 3-Way GBDT Ensemble** | 5-seed blend + multiplier | **`0.18663`** | **`0.1855`** |
+| **Baseline Random Forest** | Default features | `0.24510` | Baseline |
+| **Tuned LightGBM (Single Seed)** | Basic ratios + frequency | `0.19840` | Single Model |
+| **Deep XGBoost Regressor (Depth 9)** | Full interaction set | `0.19120` | Single Model |
+| **Production 3-Way 5-Seed Ensemble** | 5-seed blend + Jensen multiplier | **`0.18663`** | **Production Best** |
 
 ---
 
@@ -76,12 +87,18 @@ graph TD
 Machine_Learning_Practice_Project/
 ├── README.md                           # Main Project Documentation
 ├── LICENSE                             # GNU GPLv3 Copyleft License
+├── .gitignore                          # Git Exclusion Rules
 ├── requirements.txt                    # Python dependencies
 ├── docs/                               # GitHub Pages Landing Page
 │   ├── index.html
 │   └── style.css
-├── notebooks/                          # Production Jupyter Notebooks
-│   └── MLP_Production_Pipeline.ipynb   # Complete 5-Stage GBDT Ensemble Notebook
+├── notebooks/                          # Production Jupyter Notebooks (Milestones 1-5)
+│   ├── 01_Exploratory_Data_Analysis.ipynb
+│   ├── 02_Spec_Parsing_And_Baselines.ipynb
+│   ├── 03_Feature_Engineering_And_Encoding.ipynb
+│   ├── 04_Multi_Model_Gradient_Boosting.ipynb
+│   ├── 05_Production_Ensemble_And_Jensens_Multiplier.ipynb
+│   └── MLP_Production_Pipeline.ipynb
 └── src/                                # Modular Python Source Code
     ├── __init__.py
     ├── feature_engineering.py          # Temporal & Capacity extraction logic
@@ -92,29 +109,7 @@ Machine_Learning_Practice_Project/
 
 ---
 
-## ⚙️ Environment Setup & Installation
+## 📜 Copyleft License
 
-```bash
-# Clone the repository
-git clone https://github.com/24f3004027/Machine_Learning_Practice_Project.git
-cd Machine_Learning_Practice_Project
-
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
----
-
-## 🄯 License & Open Source Ethos
-
-Released under the **GNU General Public License v3.0 (GPLv3)**.
-
-```text
-🄯 Copyleft 2026 Ramrup Satpati (Roll No: 24f3004027). All Rights Reversed.
-Free Software Foundation, Inc. <https://fsf.org/>
-Everyone is permitted to copy and distribute verbatim copies of this license document.
-```
+🄯 **Copyleft 2026 Ramrup Satpati | All Rights Reversed**  
+This project is released under the **GNU General Public License v3.0 (GPLv3)**. You are free to inspect, run, modify, and distribute this codebase as long as all derived works remain open-source under GPLv3.
